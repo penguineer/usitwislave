@@ -78,3 +78,8 @@ The idle_callback is an optional callback that will be called when
 there is nothing to do (and we're not sleeping, see use_sleep),
 it's defined as void idle_callback(void). If you're not using it,
 specify NULL.
+
+Compile with define USI_TWI_WITHOUT_STATS set to exclude the statistics
+function from the generated object file. This saves about 300 bytes in the
+Flash memory. The define must be set via compiler options, otherwise it is
+not recognized in the usitwislave.c during compilation.
