@@ -11,6 +11,7 @@ void		usi_twi_slave(uint8_t slave_address, uint8_t use_sleep,
 				volatile uint8_t *output_buffer_length, volatile uint8_t *output_buffer),
 				void (*idle_callback)(void));
 
+#ifndef USI_TWI_WITHOUT_STATS
 void		usi_twi_enable_stats(uint8_t onoff);
 uint16_t	usi_twi_stats_start_conditions(void);
 uint16_t	usi_twi_stats_stop_conditions(void);
@@ -18,5 +19,6 @@ uint16_t	usi_twi_stats_error_conditions(void);
 uint16_t	usi_twi_stats_overflow_conditions(void);
 uint16_t	usi_twi_stats_local_frames(void);
 uint16_t	usi_twi_stats_idle_calls(void);
+#endif //USI_TWI_WITHOUT_STATS
 
 #endif

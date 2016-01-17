@@ -49,6 +49,7 @@ static volatile uint8_t	output_buffer[buffer_size];
 static volatile uint8_t	output_buffer_length;
 static volatile uint8_t	output_buffer_current;
 
+#ifndef USI_TWI_WITHOUT_STATS
 static			uint8_t		stats_enabled;
 static volatile uint16_t	start_conditions_count;
 static volatile uint16_t	stop_conditions_count;
@@ -56,6 +57,7 @@ static volatile uint16_t	error_conditions_count;
 static volatile uint16_t	overflow_conditions_count;
 static volatile uint16_t	local_frames_count;
 static volatile uint16_t	idle_call_count;
+#endif //USI_TWI_WITHOUT_STATS
 
 static always_inline void set_sda_to_input(void)
 {
@@ -168,8 +170,10 @@ ISR(USI_START_vect)
 	{
 		twi_reset();
 
+#ifndef USI_TWI_WITHOUT_STATS
 		if(stats_enabled)
 			error_conditions_count++;
+#endif //USI_TWI_WITHOUT_STATS
 		return;
 	}
 
@@ -204,8 +208,10 @@ ISR(USI_OVERFLOW_VECTOR)
 	uint8_t data		= USIDR;
 	uint8_t set_counter = 0x00;		// send 8 bits (16 edges)
 
+#ifndef USI_TWI_WITHOUT_STATS
 	if(stats_enabled)
 		overflow_conditions_count++;
+#endif //USI_TWI_WITHOUT_STATS
 
 again:
 	switch(of_state)
@@ -381,8 +387,10 @@ void usi_twi_slave(uint8_t slave_address_in, uint8_t use_sleep,
 
 				case(ss_state_data_processed):
 				{
+#ifndef USI_TWI_WITHOUT_STATS
 					if(stats_enabled)
 						local_frames_count++;
+#endif //USI_TWI_WITHOUT_STATS
 
 					output_buffer_length	= 0;
 					output_buffer_current	= 0;
@@ -405,11 +413,20 @@ void usi_twi_slave(uint8_t slave_address_in, uint8_t use_sleep,
 		{
 			idle_callback();
 
+#ifndef USI_TWI_WITHOUT_STATS
 			if(stats_enabled)
 				idle_call_count++;
+#endif //USI_TWI_WITHOUT_STATS
 		}
 	}
 }
+
+/*
+ * The following block will only be compiled if USI_TWI_WITHOUT_STATS
+ * is not defined.
+ */
+
+#ifndef USI_TWI_WITHOUT_STATS
 
 void usi_twi_enable_stats(uint8_t onoff)
 {
@@ -451,3 +468,5 @@ uint16_t usi_twi_stats_idle_calls(void)
 {
 	return(idle_call_count);
 }
+
+#endif //USI_TWI_WITHOUT_STATS
